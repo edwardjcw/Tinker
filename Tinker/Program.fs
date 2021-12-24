@@ -1,5 +1,5 @@
 open Tinker
 
-//AHundredPrisoners.run()
+AHundredPrisoners.run()
 //TwentyOneGame.run()
-BenfordsLaw.run()
+//BenfordsLaw.run()

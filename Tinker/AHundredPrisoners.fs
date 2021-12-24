@@ -19,12 +19,12 @@ let outcomeOfRandom runs =
     
 // strategy optimizing drawer opening
 let smartChoice max prisoner (drawers' : int array) =
-    let rec inner count selection =
+    prisoner
+    |> Seq.unfold (fun selection ->
         let card = drawers'.[selection-1]
-        if count > max then false // CASE 1: no more tries
-        else if card = prisoner then true // CASE 2: prisoner found his/her card
-        else inner (count+1) card // CASE 3: continue trying
-    inner 1 prisoner
+        Some (card, card))
+    |> Seq.take max
+    |> Seq.contains prisoner
 let smartChoices (drawers' : int array) =
     seq { 1..100 }
     |> Seq.map (fun prisoner -> smartChoice 50 prisoner drawers')
