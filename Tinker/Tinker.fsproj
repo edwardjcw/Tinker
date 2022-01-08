@@ -7,9 +7,14 @@
 
     <ItemGroup>
         <Compile Include="AHundredPrisoners.fs" />
-        <Compile Include="TwentyOneGame.fs" />
         <Compile Include="BenfordsLaw.fs" />
+        <Compile Include="BarnsleyFern.fs" />
+        <Compile Include="TwentyOneGame.fs" />
         <Compile Include="Program.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
     </ItemGroup>
 
 </Project>

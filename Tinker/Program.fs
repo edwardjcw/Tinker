@@ -1,5 +1,6 @@
 open Tinker
 
-AHundredPrisoners.run()
+//AHundredPrisoners.run()
 //TwentyOneGame.run()
 //BenfordsLaw.run()
+BarnsleyFern.run 720 720
