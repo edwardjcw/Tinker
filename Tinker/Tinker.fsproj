@@ -10,6 +10,7 @@
         <Compile Include="BenfordsLaw.fs" />
         <Compile Include="BarnsleyFern.fs" />
         <Compile Include="TwentyOneGame.fs" />
+        <Compile Include="Poker.fs"/>
         <Compile Include="Program.fs" />
     </ItemGroup>
 
