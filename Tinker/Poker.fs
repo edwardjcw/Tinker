@@ -129,7 +129,13 @@ let toCardRank {value=value; suit=suit} =
     | King -> 13
     | Ace -> 14    
 
-(*let ofAKind cards =
+let highestCardRank cards =
+    cards
+    |> List.map toCardRank
+    |> List.sortDescending
+    |> List.head
+
+let ofAKind cards =
     let toOfAKind (count, cards') =
         match count, cards' with
         | 4, card::_ -> FourOfAKind (toCardRank card)
@@ -139,8 +145,10 @@ let toCardRank {value=value; suit=suit} =
         | _, _ -> failwith "problem determining ofAKind"
     
     let toTwoPairsOrFullHouse handRanks = 
-        let orderedHandRanks = // START HERE ... order then match on that order
-        
+        match orderedHandRanks handRanks with
+        | [ThreeOfAKind ti; Pair _] -> [FullHouse ti]
+        | [Pair pi; Pair pi'; HighCard hi] -> [TwoPairs (pi, pi'); HighCard hi]
+        | other -> other
         
     cards
     |> List.groupBy (fun card -> card.value)
@@ -148,9 +156,16 @@ let toCardRank {value=value; suit=suit} =
     |> List.map (fun cards' -> (cards'.Length, cards'))
     |> List.map toOfAKind
     |> toTwoPairsOrFullHouse
-    |> List.filter (fun (value, cards') -> cards'.Length > 1)
-    |> List.map snd
-    |> List.coun*)
+
+let straight cards =
+    let isAStraight =
+        cards
+        |> List.sortBy toCardRank
+        |> List.pairwise
+        |> List.forall (fun (lowerCard, higherCard) -> toCardRank lowerCard + 1 = toCardRank higherCard)
+    if isAStraight then cards |> highestCardRank |> Straight else Empty 
+    
+// start here: let flush    ... and then for straight flush, it's whether straight and flush can apply    
 
 let toCard (rawCard : string) =
     let value =
