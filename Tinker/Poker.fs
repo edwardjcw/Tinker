@@ -164,8 +164,29 @@ let straight cards =
         |> List.pairwise
         |> List.forall (fun (lowerCard, higherCard) -> toCardRank lowerCard + 1 = toCardRank higherCard)
     if isAStraight then cards |> highestCardRank |> Straight else Empty 
+     
+let flush cards =
+    let isFlush =
+        let suitToUse = cards |> List.head |> fun {value=_; suit=suit} -> suit
+        cards
+        |> List.forall (fun {value=_; suit=suit} -> suit = suitToUse)
+    if isFlush then
+        cards
+        |> List.sortBy toCardRank
+        |> List.map toCardRank
+        |> function
+            | [a; b; c; d; e] -> Flush (a,b,c,d,e)
+            | _ -> failwith "Flush can't be created"
+    else Empty
     
-// start here: let flush    ... and then for straight flush, it's whether straight and flush can apply    
+let straightFlush cards =
+    let straight' = cards |> straight
+    let flush' = cards |> flush
+    let straightRank = function | Straight s -> s | _ -> failwith "Can't get straight value for straight flush"
+    if straight' = Empty || flush' = Empty then Empty
+    else straightRank straight' |> StraightFlush
+
+// next will be to get combine them together to find out if it's a straight flush, straight, etc
 
 let toCard (rawCard : string) =
     let value =
