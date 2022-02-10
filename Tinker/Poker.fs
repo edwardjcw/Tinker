@@ -186,8 +186,16 @@ let straightFlush cards =
     if straight' = Empty || flush' = Empty then Empty
     else straightRank straight' |> StraightFlush
 
-// next will be to get combine them together to find out if it's a straight flush, straight, etc
-
+let toPlayerRank {name=name; hand=hand; rank=_} =
+    let straightFlush' = hand |> straightFlush
+    let flush' = hand |> flush
+    let straight' = hand |> straight
+    let ofAKind' = hand |> ofAKind
+    if straightFlush' <> Empty then {name=name; hand=hand; rank=[straightFlush']}
+    else if flush' <> Empty then {name=name; hand=hand; rank=[flush']}
+    else if straight' <> Empty then {name=name; hand=hand; rank=[straight']}
+    else {name=name; hand=hand; rank=ofAKind'}
+    
 let toCard (rawCard : string) =
     let value =
         match rawCard.[0] with
@@ -225,32 +233,25 @@ let toPlayers (s : string) =
     |> Array.map (fun rawPlayer -> (rawPlayer.[0], rawPlayer.[1].Trim()))
     |> Array.map (fun (name, rawHand) -> {name=name; hand=toHand rawHand; rank=[emptyHand]})
 
-
-    
-let toPlayerRank {name=name; hand=hand; rank=_} =
-
-    let pair = // this just looks for pair, so active pattern is overkill
-        hand
-        |> List.groupBy (fun card -> card.value)
-        |> List.filter (fun (_, cards) -> cards.Length = 2)
-        |> List.map (fun (_, cards) -> cards |> List.head)
-        |> List.map toCardRank
-    let rank (p : int list) = if p.Length = 0 then 0 else p |> List.maxBy id
-    {name=name; hand=hand; rank=[Pair (rank pair)]}
-    
 let game (rawInput : string) =
     let rankedPlayers =
         rawInput
         |> toPlayers
         |> Array.map toPlayerRank
+        |> Array.toList
+    
+    let bestHand =
+        rankedPlayers
+        |> List.collect (fun {name=_; hand=_; rank=rank} -> rank)
+        |> orderedHandRanks
+        |> List.head // may have an issue with a tie
              
-    "Tie"
-(*    |> Array.fold (fun (winnerName, winnerRank) {name=name; hand=_; rank=rank} ->
-                     if winnerRank = rank then ("Tie", rank)
-                     else if winnerRank > rank then (winnerName, winnerRank)
-                     else (name, rank))
-                     ("No players, no winners", 0)
-    |> fst*)
+    let winner =
+        rankedPlayers
+        |> List.filter (fun {name=_; hand=_; rank=rank} -> rank |> (List.contains bestHand))
+        |> List.head
+             
+    winner |> fun {name=name; hand=_; rank=_} -> name 
     
 let simpleTest rawInput =
     let blackSide = [{value=Two;suit=Heart}
@@ -265,6 +266,11 @@ let simpleTest rawInput =
 
 let simpleTest2 rawInput =
     let expected = "Black"
+    let actual = (game rawInput)
+    expected = actual
+
+let simpleTest3 rawInput =
+    let expected = "White"
     let actual = (game rawInput)
     expected = actual
 
@@ -289,6 +295,8 @@ let simpleOrderedHandRankTest =
     let actual5 = orderedHandRanks [HighCard 5; TwoPairs (10, 11)]
     let result5 = expected5 = actual5
     
+    // start here ... add a highcard expected test
+    
     result1 && result2 && result3 && result4 && result5
     
 let samples =
@@ -300,6 +308,7 @@ let samples =
      "Black: AH AC 2H 2C 3D  White: 5H 5C 6S 6C 7H"]
 
 let run () =         
-    printfn $"{(simpleTest samples.[0])}"
+    //printfn $"{(simpleTest samples.[0])}"
     //printfn $"{(simpleTest2 samples.[4])}"
-    printfn $"{simpleOrderedHandRankTest}"
+    printfn $"{(simpleTest3 samples.[0])}"
+    //printfn $"{simpleOrderedHandRankTest}"
