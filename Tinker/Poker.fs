@@ -2,6 +2,7 @@
 
 let PLAYER_DELIMITER = "  "
 let HAND_DELIMITER = " "
+let HANDS_ARE_EQUAL = 5
 
 type Value =
     | Two
@@ -243,15 +244,19 @@ let game (rawInput : string) =
     let bestHand =
         rankedPlayers
         |> List.collect (fun {name=_; hand=_; rank=rank} -> rank)
+        |> List.distinct
         |> orderedHandRanks
-        |> List.head // may have an issue with a tie
-             
-    let winner =
+        |> List.rev
+        |> fun handRanks' -> if handRanks'.Length = HANDS_ARE_EQUAL then [] else handRanks'
+        |> List.tryHead
+
+    match bestHand with
+    | None -> "Tie"
+    | Some bestHand' -> 
         rankedPlayers
-        |> List.filter (fun {name=_; hand=_; rank=rank} -> rank |> (List.contains bestHand))
+        |> List.filter (fun {name=_; hand=_; rank=rank} -> rank |> (List.contains bestHand'))
         |> List.head
-             
-    winner |> fun {name=name; hand=_; rank=_} -> name 
+        |> fun {name=name; hand=_; rank=_} -> name 
     
 let simpleTest rawInput =
     let blackSide = [{value=Two;suit=Heart}
@@ -264,15 +269,9 @@ let simpleTest rawInput =
     let actual = (toPlayers rawInput).[0]
     expected = actual
 
-let simpleTest2 rawInput =
-    let expected = "Black"
+let simpleTestWinner winner rawInput =
     let actual = (game rawInput)
-    expected = actual
-
-let simpleTest3 rawInput =
-    let expected = "White"
-    let actual = (game rawInput)
-    expected = actual
+    winner = actual 
 
 let simpleOrderedHandRankTest =
     let expected1 = [StraightFlush 10]
@@ -307,8 +306,14 @@ let samples =
      "Black: 2H 3D 5S 9C KD  White: 2D 3H 5C 9S KH"
      "Black: AH AC 2H 2C 3D  White: 5H 5C 6S 6C 7H"]
 
-let run () =         
-    //printfn $"{(simpleTest samples.[0])}"
-    //printfn $"{(simpleTest2 samples.[4])}"
-    printfn $"{(simpleTest3 samples.[0])}"
-    //printfn $"{simpleOrderedHandRankTest}"
+let run () =
+    let white = "White"
+    let black = "Black"
+    let tie = "Tie"
+    //printfn $"proper conversion: {(simpleTest samples.[0])}"
+   // printfn $"high card: {(simpleTestWinner white samples.[0])}"
+    //printfn $"full house beats flush: {(simpleTestWinner black samples.[1])}"
+    //printfn $"next highest card: {(simpleTestWinner black samples.[2])}"
+    //printfn $"tie: {(simpleTestWinner tie samples.[3])}"
+    printfn $"higher two pairs wins: {(simpleTestWinner black samples.[4])}" 
+    //printfn $"ordering works: {simpleOrderedHandRankTest}"
