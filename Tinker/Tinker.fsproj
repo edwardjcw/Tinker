@@ -10,12 +10,12 @@
         <Compile Include="BenfordsLaw.fs" />
         <Compile Include="BarnsleyFern.fs" />
         <Compile Include="TwentyOneGame.fs" />
-        <Compile Include="Poker.fs"/>
+        <Compile Include="Poker.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
+      <PackageReference Include="System.Drawing.Common" Version="6.0.2-mauipre.1.22054.8" />
     </ItemGroup>
 
 </Project>

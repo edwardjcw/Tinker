@@ -58,30 +58,39 @@ let compareHandRanks left right =
         
     match left, right with
     | StraightFlush li, StraightFlush ri -> comparison li ri
+    | _, StraightFlush _ -> LessThan
     | StraightFlush _, _ -> Greater
     | FourOfAKind li, FourOfAKind ri -> comparison li ri
+    | _, FourOfAKind _ -> LessThan
     | FourOfAKind _, _ -> Greater
     | FullHouse li, FullHouse ri -> comparison li ri
+    | _, FullHouse _ -> LessThan 
     | FullHouse _, _ -> Greater
     | Flush (la, lb, lc, ld, le), Flush (ra, rb, rc, rd, re) ->
         let orderedValues (a, b, c, d, e) = [a; b; c; d; e] |> List.sortDescending
         let orderedLi = (la, lb, lc, ld, le) |> orderedValues
         let orderedRi = (ra, rb, rc, rd, re) |> orderedValues
         List.zip orderedLi orderedRi |> comparisonMultiple
+    | _, Flush _ -> LessThan
     | Flush _, _ -> Greater
     | Straight li, Straight ri -> comparison li ri
+    | _, Straight _ -> LessThan
     | Straight _, _ -> Greater
     | ThreeOfAKind li, ThreeOfAKind ri -> comparison li ri
+    | _, ThreeOfAKind _ -> LessThan 
     | ThreeOfAKind _, _ -> Greater
     | TwoPairs (la, lb), TwoPairs (ra, rb) ->
         let orderedValues (a, b) = [a; b] |> List.sortDescending
         let orderedLi = (la, lb) |> orderedValues
         let orderedRi = (ra, rb) |> orderedValues
         List.zip orderedLi orderedRi |> comparisonMultiple
+    | _, TwoPairs _ -> LessThan
     | TwoPairs _, _ -> Greater
     | Pair li, Pair ri -> comparison li ri
+    | _, Pair _ -> LessThan 
     | Pair _, _ -> Greater
     | HighCard li, HighCard ri -> comparison li ri
+    | _, HighCard _ -> LessThan 
     | HighCard _, _ -> Greater
     | _ -> Equal
 
@@ -146,7 +155,7 @@ let ofAKind cards =
         | _, _ -> failwith "problem determining ofAKind"
     
     let toTwoPairsOrFullHouse handRanks = 
-        match orderedHandRanks handRanks with
+        match orderedHandRanks handRanks |> List.rev with
         | [ThreeOfAKind ti; Pair _] -> [FullHouse ti]
         | [Pair pi; Pair pi'; HighCard hi] -> [TwoPairs (pi, pi'); HighCard hi]
         | other -> other
@@ -273,7 +282,7 @@ let simpleTestWinner winner rawInput =
     let actual = (game rawInput)
     winner = actual 
 
-let simpleOrderedHandRankTest =
+let simpleOrderedHandRankTest () =
     let expected1 = [StraightFlush 10]
     let actual1 = orderedHandRanks expected1
     let result1 = expected1 = actual1
@@ -287,16 +296,22 @@ let simpleOrderedHandRankTest =
     let result3 = expected3 = actual3
     
     let expected4 = [FourOfAKind 2; HighCard 5]
-    let actual4 = orderedHandRanks [HighCard 5; FourOfAKind 2]
+    let actual4 = orderedHandRanks [HighCard 5; FourOfAKind 2] |> List.rev
     let result4 = expected4 = actual4
     
     let expected5 = [TwoPairs (10, 11); HighCard 5]
-    let actual5 = orderedHandRanks [HighCard 5; TwoPairs (10, 11)]
+    let actual5 = orderedHandRanks [HighCard 5; TwoPairs (10, 11)] |> List.rev
     let result5 = expected5 = actual5
     
     // start here ... add a highcard expected test
     
     result1 && result2 && result3 && result4 && result5
+
+let simpleOrderedHandRankTest2 () =
+    let expected = [TwoPairs (13, 6); TwoPairs (12, 10); HighCard 14; HighCard 11]
+    let actual = orderedHandRanks expected |> List.rev
+    let result = expected = actual
+    result
     
 let samples =
     [
@@ -310,10 +325,11 @@ let run () =
     let white = "White"
     let black = "Black"
     let tie = "Tie"
-    //printfn $"proper conversion: {(simpleTest samples.[0])}"
-   // printfn $"high card: {(simpleTestWinner white samples.[0])}"
-    //printfn $"full house beats flush: {(simpleTestWinner black samples.[1])}"
-    //printfn $"next highest card: {(simpleTestWinner black samples.[2])}"
-    //printfn $"tie: {(simpleTestWinner tie samples.[3])}"
+    printfn $"proper conversion: {(simpleTest samples.[0])}"
+    printfn $"high card: {(simpleTestWinner white samples.[0])}"
+    printfn $"full house beats flush: {(simpleTestWinner black samples.[1])}"
+    printfn $"next highest card: {(simpleTestWinner black samples.[2])}"
+    printfn $"tie: {(simpleTestWinner tie samples.[3])}"
     printfn $"higher two pairs wins: {(simpleTestWinner black samples.[4])}" 
-    //printfn $"ordering works: {simpleOrderedHandRankTest}"
+    printfn $"ordering works: {simpleOrderedHandRankTest ()}"
+    printfn $"ordering works2: {simpleOrderedHandRankTest2 ()}"
