@@ -11,6 +11,7 @@
         <Compile Include="BarnsleyFern.fs" />
         <Compile Include="TwentyOneGame.fs" />
         <Compile Include="Monadster.fs" />
+        <Compile Include="CodeWars.fs" />
         <Compile Include="Poker.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>

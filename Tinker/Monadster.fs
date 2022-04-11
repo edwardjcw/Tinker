@@ -485,3 +485,14 @@ module State =
                 let threeN = calculate three |> getValue
                 let fiveN = calculate five |> getValue
                 printfn $"{nameof threeN}: {threeN}, {nameof fiveN}: {fiveN}"
+                
+module Test =
+    let run () =
+        LeftLeg.test()
+        LeftArm.test()
+        RightArm.test()
+        Head.test()
+        Heart.test()
+        Body.test()
+        State.Example.HelloWorld.test()
+        State.Example.Calculator.test()

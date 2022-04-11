@@ -1,16 +1,22 @@
+open System.Runtime.CompilerServices
 open Tinker
 open System 
+
+[<Extension>]
+type List<'T> =
+    [<Extension>]
+    static member OfOption opt =
+        match opt with
+        | Some x -> [x]
+        | None -> []
+
+
 //AHundredPrisoners.run()
 //TwentyOneGame.run()
 //BenfordsLaw.run()
 //BarnsleyFern.run 720 720
 //Poker.run()
 
-Monadster.LeftLeg.test()
-Monadster.LeftArm.test()
-Monadster.RightArm.test()
-Monadster.Head.test()
-Monadster.Heart.test()
-Monadster.Body.test()
-Monadster.State.Example.HelloWorld.test()
-Monadster.State.Example.Calculator.test()
+//Monadster.Test.run()
+
+Some 5 |> List.OfOption |> printfn "%A"
